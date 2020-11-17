@@ -7,7 +7,6 @@ class BoxedTree extends BaseTree{
     /** 
      * @param {object} options The options object.
      * @param {bodyDisplayTextAccessorCallBack} options.getBodyDisplayText Determines how to obtain the body text to display for a node corresponding to a data item.
-     * @param {titleDisplayTextAccessorCallBack} options.getTitleDisplayText Determines how to obtain the title text to display for a node corresponding to a data item.
     */
     constructor(options) {
         super(options);
@@ -18,7 +17,6 @@ class BoxedTree extends BaseTree{
         };
 
         this._getBodyDisplayText = mergedOptions.getBodyDisplayText;
-        this._getTitleDisplayText = mergedOptions.getTitleDisplayText;
         this.nodeSettings = new BoxedNodeSettings(this, mergedOptions.nodeSettings);
     }
 
@@ -39,9 +37,26 @@ class BoxedTree extends BaseTree{
         var nodeBodyBoxHeight = self.nodeSettings.getBodyBoxHeight();
         var nodeBodyBoxPadding = self.nodeSettings.getBodyBoxPadding();
 
-        var nodeTitleBoxWidth = self.nodeSettings.getTitleBoxWidth();
-        var nodeTitleBoxHeight = self.nodeSettings.getTitleBoxHeight();
-        var nodeTitleBoxPadding = self.nodeSettings.getTitleBoxPadding();
+        // Add the Shadow
+        var defs = nodeEnter.append("defs");
+        var filter = defs.append("filter")
+            .attr("id", "drop-shadow")
+            .attr("height", "130%");
+        filter.append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 4)
+            .attr("result", "blur");
+        filter.append("feOffset")
+            .attr("dx", 2)
+            .attr("dy", 2);
+        var feComponentTransfer = filter.append("feComponentTransfer");
+        feComponentTransfer.append("feFuncA")
+            .attr("type", "linear")
+            .attr("slope", "0.3");
+        var feMerge = filter.append("feMerge");
+        feMerge.append("feMergeNode");
+        feMerge.append("feMergeNode")
+            .attr("in", "SourceGraphic");
 
         /* Add Body Rectangle and Text for Node */
         var bodyGroups = nodeEnter.append("g")
@@ -49,81 +64,65 @@ class BoxedTree extends BaseTree{
 
         bodyGroups.append("rect")
             .classed("body-box", true)
+            .style("filter", "url(#drop-shadow)")
             .attr("width", 0.000001)
             .attr("height", 0.000001);
+        
+        var circleRadius = 12;
+        var circleX = nodeBodyBoxWidth - 2 * circleRadius;
+
+        var boxCircles = bodyGroups.append("circle")
+            .classed("body-box-circle", true)
+            .attr("cx", circleX)
+            .attr("r", function(d) {
+                if (d.data.children.length === 0) {
+                    return 0
+                } else {
+                    return circleRadius
+                }
+            });
+        
+        bodyGroups.append("text")
+            .classed("body-circle-text", true)
+            .attr("x", circleX)
+            .attr("y", 1)
+            .attr("text-anchor", "middle")
+            .attr("alignment-baseline", "middle")
+            .style("font-weight", "700")
+            .text(function(d) { 
+                if (d.data.children.length === 0) {
+                    return ""
+                } else {
+                    return d.data.children.length
+                }
+            });
 
         bodyGroups.each(function(data, index, arr) {
             var element = this;
-            var selection = d3.select(element);
             var singledOutData = [];
             singledOutData.push(data);
 
             var recalculatedPaddingTop = nodeBodyBoxPadding.top;
-            if (self.getTitleDisplayText.call(self, data))
-            {
-                recalculatedPaddingTop += nodeTitleBoxHeight / 2;
-            }
 
             // D3Plus Textbox with resizing capability
             var d3PlusBodyTextBox = new d3PlusTextBox()
                 .select(element) // Sets the D3Plus code to append to the specified DOM element.
                 .data(singledOutData)
                 .text((data, index, arr) => {
+                    // console.log("logging data in d3PlusBodyTextBox");
+                    // console.log(data);
                     return self.getBodyDisplayText.call(self, data);
                 })
-                .textAnchor("middle")
+                .textAnchor("left")
                 .verticalAlign("middle")
-                .fontSize(13) // in pixels
+                .fontSize(14)
                 .x(nodeBodyBoxPadding.left)
                 .y(recalculatedPaddingTop - nodeBodyBoxHeight / 2)
-                .width(nodeBodyBoxWidth - nodeBodyBoxPadding.left - nodeBodyBoxPadding.right)
+                .width(nodeBodyBoxWidth - nodeBodyBoxPadding.left - nodeBodyBoxPadding.right - 2 * circleRadius)
                 .height(nodeBodyBoxHeight - recalculatedPaddingTop - nodeBodyBoxPadding.bottom)
-                .ellipsis((text, line) => {
-                    // If text was cut-off, add tooltip
-                    selection.append("title")
-                        .text(self.getBodyDisplayText(data));
-                    return ((text.replace(/\.|,$/g, "")) + "...");
-                })
                 .render();
         });
 
-        /* Add Title Rectangle and Text for Node */
-        var titleGroups = nodeEnter.append("g")
-            .classed("title-group", true)
-            .attr("transform", "translate(" + -nodeTitleBoxWidth / 3 + ", " + (-nodeTitleBoxHeight / 2 - nodeBodyBoxHeight / 2) + ")");
-
-        titleGroups.each(function(data, index, arr) {
-            if (!self.getTitleDisplayText.call(self, data))
-                return;
-            var element = this;
-            var selection = d3.select(element);
-            var singledOutData = [];
-            singledOutData.push(data);
-
-            selection.append("rect")
-                .classed("title-box", true)
-                .attr("width", nodeTitleBoxWidth)
-                .attr("height", nodeTitleBoxHeight);
-
-            // D3Plus Textbox with resizing capability
-            var d3PlusTitleTextBox = new d3PlusTextBox()
-                .select(element) // Sets the D3Plus code to append to the DOM element.
-                .data(singledOutData)
-                .text((data, index, arr) => {
-                    return self.getTitleDisplayText.call(self, data);
-                })
-                .textAnchor("middle")
-                .verticalAlign("middle")
-                .x(nodeTitleBoxPadding.left)
-                .y(nodeTitleBoxPadding.top)
-                .fontWeight(700)
-                .fontMin(6)
-                .fontMax(16)
-                .fontResize(true) // Resizes the text to fit the content
-                .width(nodeTitleBoxWidth - nodeTitleBoxPadding.left - nodeTitleBoxPadding.right)
-                .height(nodeTitleBoxHeight - nodeTitleBoxPadding.top - nodeTitleBoxPadding.bottom)
-                .render();
-        });
         return self;
     }
 
@@ -186,25 +185,16 @@ class BoxedTree extends BaseTree{
         nodeExitTransition.select(".node .body-group rect")
             .attr("width", 0.000001)
             .attr("height", 0.000001);
+        
+        nodeExitTransition.select(".node .body-group circle")
+            .attr("r", 0.000001);
+        
+        nodeExitTransition.select(".node .body-group text")
+            .style("fill-opacity", 0.000001);
 
         nodeExitTransition.select(".node .body-group .d3plus-textBox")
             .style("fill-opacity", 0.000001)
             .attr("transform", (data, index, arr) => "translate(0," + (-nodeBodyBoxHeight / 2) + ")")
-            .selectAll("text")
-                .style("font-size", 0)
-                .attr("y", "0px")
-                .attr("x", "0px");
-
-        nodeExitTransition.select(".node .title-group")
-            .attr("transform", "translate(0, " + (-nodeBodyBoxHeight / 2) + ")");
-
-        nodeExitTransition.select(".node .title-group rect")
-            .attr("width", 0.000001)
-            .attr("height", 0.000001);
-
-        nodeExitTransition.select(".node .title-group .d3plus-textBox")
-            .style("fill-opacity", 0.000001)
-            .attr("transform", "translate(0,0)")
             .selectAll("text")
                 .style("font-size", 0)
                 .attr("y", "0px")
@@ -369,30 +359,6 @@ class BoxedTree extends BaseTree{
         return this._getBodyDisplayText(nodeDataItem.data);
     }
 
-    /**
-     * Sets the title display text accessor,
-     * used to get the title display text
-     * for the nodes.
-     * 
-     * @param {titleDisplayTextAccessorCallBack} newTitleDisplayTextAccessor 
-     */
-    setTitleDisplayTextAccessor(newTitleDisplayTextAccessor) {
-        this._getTitleDisplayText = newTitleDisplayTextAccessor;
-        return this;
-    }
-
-    /**
-     * Gets the title display text for a given data item.
-     * 
-     * @param {object} nodeDataItem The D3 node data item to get the title display text from.
-     * @returns {string} The title display text to render for the node.
-     */
-    getTitleDisplayText(nodeDataItem) {
-        // Note that data in this context refers to D3 Tree data, not the original item data
-        // To Access the original item data, use the ".data" property
-        return this._getTitleDisplayText(nodeDataItem.data);
-    }
-
     /** @inheritdoc */
     centerNode(nodeDataItem) {
         var nodeBodyBoxWidth = this.nodeSettings.getBodyBoxWidth();
@@ -410,32 +376,10 @@ class BoxedTree extends BaseTree{
         return super.centerNode(nodeDataItem);
     }
 
-    /**
-     * Determines how to obtain the body text
-     * to display for a node corresponding
-     * to a data item.
-     * 
-     * @callback bodyDisplayTextAccessorCallBack
-     * @param {object} data The data item to get the body display text from.
-     * @returns {string} The body display text to render for the node.
-     */
-
-    /**
-     * Determines how to obtain the title text
-     * to display for a node corresponding
-     * to a data item.
-     * 
-     * @callback titleDisplayTextAccessorCallBack
-     * @param {object} data The data item to get the title display text from.
-     * @returns {string} The title display text to render for the node.
-     */
 }
 
 BoxedTree.defaults = {
-    getBodyDisplayText: null,
-    getTitleDisplayText: (dataItem) => {
-        return null;
-    }
+    getBodyDisplayText: null
 }
 
 export default BoxedTree;

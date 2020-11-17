@@ -11,13 +11,6 @@ class BoxedNodeSettings extends NodeSettings {
      * @param {number} [options.bodyBoxPadding.right=10] Body box padding right.
      * @param {number} [options.bodyBoxPadding.bottom=5] Body box padding bottom.
      * @param {number} [options.bodyBoxPadding.left=10] Body box padding left.
-     * @param {number} [options.titleBoxWidth] Title box width.
-     * @param {number} [options.titleBoxHeight=40] Title box height.
-     * @param {object} [options.titleBoxPadding] Title box padding object.
-     * @param {number} [options.titleBoxPadding.top=2] Title box padding top.
-     * @param {number} [options.titleBoxPadding.right=5] Title box padding right.
-     * @param {number} [options.titleBoxPadding.bottom=2] Title box padding bottom.
-     * @param {number} [options.titleBoxPadding.left=5] Title box padding left.
      */
     constructor(ownerObject, options) {
         super(ownerObject, options);
@@ -30,9 +23,6 @@ class BoxedNodeSettings extends NodeSettings {
         this._bodyBoxWidth = mergedOptions.bodyBoxWidth;
         this._bodyBoxHeight = mergedOptions.bodyBoxHeight;
         this._bodyBoxPadding = mergedOptions.bodyBoxPadding;
-        this._titleBoxWidth = mergedOptions.titleBoxWidth;
-        this._titleBoxHeight = mergedOptions.titleBoxHeight;
-        this._titleBoxPadding = mergedOptions.titleBoxPadding;
     }
 
     /**
@@ -98,73 +88,6 @@ class BoxedNodeSettings extends NodeSettings {
     getBodyBoxPadding() {
         return this._bodyBoxPadding;
     }
-
-    /**
-     * Gets the title box width value.
-     * 
-     * @returns {number} The title box width value.
-     */
-    getTitleBoxWidth() {
-        if (this._titleBoxWidth)
-            return this._titleBoxWidth;
-        else
-            return this.getBodyBoxWidth() / 2;
-    }
-
-    /**
-     * Sets the title box width value.
-     * 
-     * @param {number} width The title box width value.
-     * @returns {object} The node settings object.
-     */
-    setTitleBoxWidth(width) {
-        this._titleBoxWidth = width;
-        return this;
-    }
-
-    /**
-     * Gets the title box height value.
-     * 
-     * @returns {number} The title box height value.
-     */
-    getTitleBoxHeight() {
-        return this._titleBoxHeight;
-    }
-
-    /**
-     * Sets the title box height value.
-     * 
-     * @param {number} height The title box height value.
-     * @returns {object} The node settings object.
-     */
-    setTitleBoxHeight(height) {
-        this._titleBoxHeight = height;
-        return this;
-    }
-
-    /**
-     * Gets the title box padding values.
-     * 
-     * @returns {object} The title box padding object.
-     */
-    getTitleBoxPadding() {
-        return this._titleBoxPadding;
-    }
-    
-    /**
-     * Sets the title box padding values.
-     * 
-     * @param {object} newPadding The body box padding object value.
-     * @param {number} newPadding.top The body box padding top value.
-     * @param {number} newPadding.right The body box padding right value.
-     * @param {number} newPadding.bottom The body box padding bottom value.
-     * @param {number} newPadding.left The body box padding left value.
-     * @returns {object} The node settings object.
-     */
-    setTitleBoxPadding(newPadding) {
-        this._titleBoxPadding = newPadding;
-        return this;
-    }
 }
 
 BoxedNodeSettings.defaults = {
@@ -175,14 +98,6 @@ BoxedNodeSettings.defaults = {
         right: 10,
         bottom: 5,
         left: 10
-    },
-    titleBoxWidth: null,
-    titleBoxHeight: 40,
-    titleBoxPadding: {
-        top: 2,
-        right: 5,
-        bottom: 2,
-        left: 5
     },
 }
 

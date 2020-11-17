@@ -26,3 +26,5 @@ The project documentation can be found in the repo's [Netlify site](https://d3-m
 # License
 
 MIT © Michael Tran
+
+npm run watch
