@@ -93,7 +93,7 @@ class BoxedTree extends BaseTree{
                 if (d.data.children.length === 0) {
                     return ""
                 } else {
-                    return d.data.children.length
+                    return d.data.leaf_count
                 }
             });
 
