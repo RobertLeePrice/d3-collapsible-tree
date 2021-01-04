@@ -182,12 +182,10 @@
             expandedNodeIDs.push(event.nodeDataItem.data.id);
           }
           if (event.type == 'collapse') {
-            // event.nodeDataItem.selected = false;
             var indexToRemove = expandedNodeIDs.indexOf(event.nodeDataItem.data.id);
             if (indexToRemove > -1) {
               expandedNodeIDs.splice(indexToRemove, 1);
             }
-            // this.update()
           }         
           localStorage.setItem('treeStateData', JSON.stringify(expandedNodeIDs));
 				})
