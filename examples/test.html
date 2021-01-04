@@ -9,7 +9,8 @@
 		<title></title>
 		<script src="../dist/js/d3-mitch-tree.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="../dist/css/d3-mitch-tree.min.css">
-		<link rel="stylesheet" type="text/css" href="../dist/css/d3-mitch-tree-theme-default.min.css">
+    <link rel="stylesheet" type="text/css" href="../dist/css/d3-mitch-tree-theme-default.min.css">
+    <script src="https://use.fontawesome.com/7ae554ca13.js"></script>
 	</head>
 	<body>
 		<section id="visualisation" style="max-width: 1000px;">
@@ -112,7 +113,8 @@
        'id': 21,
        'leaf_count': 1,
        'name': 'Silver Fox Rabbit',
-       'type': 'Organism'}],
+       'type': 'Organism',
+      'is_important': true}],
      'description': 'Also known as rabbits',
      'id': 19,
      'leaf_count': 2,
@@ -133,18 +135,12 @@
 			}
 
 			var data = getData();
-
-            console.log(data);
-            
-            for (var v of data['children']) {
-                console.log(v);
-            }
 			
 			var treePlugin = new d3.mitchTree.boxedTree()
 				.setAllowFocus(false)
 				.setAllowZoom(false)
 				.setAllowPan(true)
-				.setAllowNodeCentering(false)
+        .setAllowNodeCentering(false)
 				.setMargins({
 					top: 0,
 					right: 0,
@@ -173,11 +169,37 @@
 					return data.name;
 				})
 				.on("nodeClick", function(event) {
-					if ((event.type == 'expand') & (event.nodeDataItem.data.children.length === 0)) {
-						console.log("this is the last node");
-					}
+          var visibleNodes = this.getVisibleNodes();
+          var expandedNodeIDs = [];
+          visibleNodes.forEach(function(node, index, arr) {
+            if (node.parent) {
+              if (!expandedNodeIDs.includes(node.parent.data.id)) {
+                expandedNodeIDs.push(node.parent.data.id);
+              }
+            }
+          })
+          if (event.type == 'expand') {
+            expandedNodeIDs.push(event.nodeDataItem.data.id);
+          }
+          if (event.type == 'collapse') {
+            // event.nodeDataItem.selected = false;
+            var indexToRemove = expandedNodeIDs.indexOf(event.nodeDataItem.data.id);
+            if (indexToRemove > -1) {
+              expandedNodeIDs.splice(indexToRemove, 1);
+            }
+            // this.update()
+          }         
+          localStorage.setItem('treeStateData', JSON.stringify(expandedNodeIDs));
 				})
-				.initialize();
+        .initialize();
+
+        var loadVisibleNodes = JSON.parse(localStorage.getItem('treeStateData'));
+        loadVisibleNodes.forEach(function(nodeID, index, arr) {
+          var nodeToExpand = treePlugin.getNode(nodeID);
+          treePlugin.expand(nodeToExpand);
+          treePlugin.update(treePlugin.getRoot());
+        });
+
 				
 		</script>
 	</body>

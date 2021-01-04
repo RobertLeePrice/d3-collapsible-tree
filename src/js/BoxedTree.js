@@ -71,10 +71,24 @@ class BoxedTree extends BaseTree{
         var circleRadius = 12;
         var circleX = nodeBodyBoxWidth - 2 * circleRadius;
 
+        var starIcon = bodyGroups.append('text')
+            .attr("class", "icon-star")
+            .attr("font-family", "FontAwesome")
+            .attr("font-size", d => { 
+                if ((d.data.children.length === 0) & (d.data.is_important === true)) {
+                    return circleRadius * 2
+                } else {
+                    return 0
+                }
+            })
+            .attr('x', circleX - 12)
+            .attr('y', 8)
+            .text(function(d) { return '\uf005' }); 
+
         var boxCircles = bodyGroups.append("circle")
             .classed("body-box-circle", true)
             .attr("cx", circleX)
-            .attr("r", function(d) {
+            .attr("r", d => { 
                 if (d.data.children.length === 0) {
                     return 0
                 } else {

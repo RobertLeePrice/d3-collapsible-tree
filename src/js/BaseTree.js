@@ -1351,7 +1351,8 @@ class BaseTree extends EventEmitter {
     nodeToggle(nodeDataItem) {
         // Clear all selections, and select current node
         this.removeSelection(this.getRoot());
-        nodeDataItem.selected = true;
+
+        (nodeDataItem.selected === true) ? false : true;
         // If it hasn't been loaded, and it's specified to have children,
         // then perform load-on-demand to load new items from server
         // and add them as child nodes
