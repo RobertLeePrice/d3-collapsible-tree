@@ -202,11 +202,11 @@ class BoxedTree extends BaseTree{
         
         nodeExitTransition.select(".node .body-group circle")
             .attr("r", 0.000001);
-        
-        nodeExitTransition.select(".node .body-group text")
+                
+        nodeExitTransition.selectAll(".node .body-group text")
             .style("fill-opacity", 0.000001);
 
-        nodeExitTransition.select(".node .body-group .d3plus-textBox")
+        nodeExitTransition.select(".node .body-group")
             .style("fill-opacity", 0.000001)
             .attr("transform", (data, index, arr) => "translate(0," + (-nodeBodyBoxHeight / 2) + ")")
             .selectAll("text")

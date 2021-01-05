@@ -1352,7 +1352,10 @@ class BaseTree extends EventEmitter {
         // Clear all selections, and select current node
         this.removeSelection(this.getRoot());
 
-        (nodeDataItem.selected === true) ? false : true;
+        // nodeDataItem.selected = true;
+
+        // (nodeDataItem.selected === true) ? false : true;
+
         // If it hasn't been loaded, and it's specified to have children,
         // then perform load-on-demand to load new items from server
         // and add them as child nodes
@@ -1367,10 +1370,14 @@ class BaseTree extends EventEmitter {
             this.loadOnDemandSettings.loadChildren(nodeDataItem.data, processData);
         }
         else {
-            if (nodeDataItem.children)
+            if (nodeDataItem.children) {
                 this.collapse(nodeDataItem);
-            else
+                (nodeDataItem.selected === true) ? false : true;
+            }
+            else {
                 this.expand(nodeDataItem);
+                nodeDataItem.selected = true;
+            }
             this.update(nodeDataItem);
             if (this.getAllowNodeCentering() === true)
                 this.centerNode(nodeDataItem);
