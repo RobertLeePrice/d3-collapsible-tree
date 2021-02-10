@@ -10511,17 +10511,15 @@ var BoxedTree_BoxedTree = /*#__PURE__*/function (_BaseTree) {
       bodyGroups.append("rect").classed("body-box", true).style("filter", "url(#drop-shadow)").attr("width", 0.000001).attr("height", 0.000001);
       var circleRadius = 12;
       var circleX = nodeBodyBoxWidth - 2 * circleRadius;
-      var starIcon = bodyGroups.append('text').attr("class", "icon-star") // .attr("font-family", "FontAwesome")
-      .attr("font-size", function (d) {
+      var starIcon = bodyGroups.append('text').attr("class", "icon-star").attr("font-family", "FontAwesome").attr("font-size", function (d) {
         if (d.data.children.length === 0 & d.data.is_important === true) {
           return circleRadius * 2;
         } else {
           return 0;
         }
       }).attr('x', circleX - 12).attr('y', 8).text(function (d) {
-        return 'S';
-      }); // .text(function(d) { return '\uf005' }); 
-
+        return "\uF005";
+      });
       var boxCircles = bodyGroups.append("circle").classed("body-box-circle", true).attr("cx", circleX).attr("r", function (d) {
         if (d.data.children.length === 0) {
           return 0;
