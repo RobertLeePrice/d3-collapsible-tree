@@ -95,6 +95,24 @@ class BoxedTree extends BaseTree{
                     return circleRadius
                 }
             });
+
+        var colorCircle = bodyGroups.append("circle")
+            .classed("body-box-color-circle", true)
+            .attr("cx", d => {
+                if (d.data.is_important === true) {
+                    return circleX - 30
+                } else {
+                    return circleX
+                }
+            })
+            .attr("r", d => { 
+                if (d.data.color) {
+                    return circleRadius
+                } else {
+                    return 0
+                }
+            })
+            .style("fill", d => {return d.data.color});
         
         bodyGroups.append("text")
             .classed("body-circle-text", true)
