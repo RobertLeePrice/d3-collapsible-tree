@@ -72,8 +72,9 @@ class BoxedTree extends BaseTree{
         var circleX = nodeBodyBoxWidth - 2 * circleRadius;
 
         var starIcon = bodyGroups.append('text')
-            .attr("class", "icon-star")
-            .attr("font-family", "FontAwesome")
+            .attr("font-family", "Arial, Helvetica, sans-serif")
+            .attr("font-weight", "600")
+            .attr("fill", "#DC6B2F")
             .attr("font-size", d => { 
                 if ((d.data.children.length === 0) & (d.data.is_important === true)) {
                     return circleRadius * 2
@@ -83,7 +84,7 @@ class BoxedTree extends BaseTree{
             })
             .attr('x', circleX - 12)
             .attr('y', 8)
-            .text(function(d) { return '\uf005' }); 
+            .text(function(d) { return 'S' }); 
 
         var boxCircles = bodyGroups.append("circle")
             .classed("body-box-circle", true)
